@@ -19,7 +19,7 @@ class K8sDiagram:
     if issubclass(kind, Node):
       kind(data['metadata']['name'])
     else:
-      self.nodes.append(kind(data, self))
+      self.nodes.append(kind(data))
 
   def run(self, show=False):
     with Diagram("Kubernetes", show=show, direction="TB"):

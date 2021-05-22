@@ -29,7 +29,7 @@ def map_kind(kind):
         pass
 
 class Deployment:
-  def __init__(self, data, context):
+  def __init__(self, data):
     self.data = data
     self.name = get_name(data)
     containers = data['spec']['template']['spec']['containers']
@@ -46,7 +46,7 @@ class Deployment:
 
 
 class Service:
-  def __init__(self, data, context):
+  def __init__(self, data):
     self.data = data
     self.name = get_name(data)
     self.node = SVC(self.name)
@@ -64,7 +64,7 @@ class Service:
 
 
 class Ingress:
-  def __init__(self, data, context):
+  def __init__(self, data):
     self.data = data
     self.name = get_name(data)
     self.node = Ing(self.name)
