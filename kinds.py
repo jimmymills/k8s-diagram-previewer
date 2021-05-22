@@ -67,7 +67,12 @@ class Service:
   def link(self, context):
     selector = self.data['spec']['selector']
     for node in context.nodes:
-      if node.labels == selector:
+      if not node.labels:
+        continue
+      for k in selector.keys():
+        if node.labels.get(k) != selector[k]:
+          break
+      else:
         port_label = ""
         # port_label is too sloppy, leaving commented until
         # a better method is found for denoting port mapping
