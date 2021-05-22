@@ -38,7 +38,7 @@ class K8sDiagram:
 
   def run(self, show=False):
     with Diagram("Kubernetes", show=show, direction="TB"):
-      paths = Path(self.folder_path).glob('**/*.yaml')
+      paths = Path(self.folder_path).glob('*.yaml')
       for path in paths:
         self.process_file(path)
       for node in self.nodes:
