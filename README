@@ -1,0 +1,23 @@
+# K8s Diagram Previewer
+
+## Installation
+
+Clone the repo and run `pip install -r requirements.txt`
+
+## Running
+
+This script takes one argument, a path to a folder 
+containing K8s YAML definitions and outputs a PNG
+diagram representing those definitions.
+
+`python diagram.py <path_to_folder>`
+
+To try out the example, run `python3 diagram.py ./example_yaml`
+
+## Support
+
+This tool currently supports the following Kubernetes resource types:
+
+* Deployment
+* Service
+* Ingress

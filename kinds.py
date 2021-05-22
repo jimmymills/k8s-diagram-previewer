@@ -1,0 +1,66 @@
+from diagrams import Cluster, Edge
+from diagrams.k8s.compute import Pod
+from diagrams.k8s.network import SVC, Ing
+
+def get_name(data):
+  return data['metadata']['name']
+
+class Deployment:
+  def __init__(self, data, context):
+    self.data = data
+    self.name = get_name(data)
+    containers = data['spec']['template']['spec']['containers']
+    self.ports = [port for container in containers for port in container['ports']]
+    self.labels = data['spec']['template']['metadata']['labels']
+    with Cluster(f'Deployment: {self.name}'):
+      with Cluster(f'ReplicaSet: {self.name}'):
+        self.node = [
+            Pod(f'{self.name}-{i}') for i in range(data['spec']['replicas'])
+        ]
+
+  def link(self, context):
+    pass
+
+
+class Service:
+  def __init__(self, data, context):
+    self.data = data
+    self.name = get_name(data)
+    self.node = SVC(self.name)
+    self.ports = data['spec']['ports']
+    self.labels = data['metadata'].get('labels')
+
+  def link(self, context):
+    selector = self.data['spec']['selector']
+    for node in context.nodes:
+      if node.labels == selector:
+        port_label = ""
+        for port in self.ports:
+          port_label += f"{port['port']} -> {port['targetPort']}\n"
+        self.node >> Edge(label=port_label) >> node.node
+
+
+class Ingress:
+  def __init__(self, data, context):
+    self.data = data
+    self.name = get_name(data)
+    self.node = Ing(self.name)
+    self.labels = data['metadata'].get('labels')
+
+  def link(self, context):
+    rules = self.data['spec']['rules']
+    paths = [path for rule in rules for path in rule['http']['paths']]
+    for path in paths:
+      svc = path['backend'].get('serviceName') or path['backend']['service']['name']
+      port = path['backend'].get('servicePort') or path['backend']['service']['port']['number']
+      for node in context.nodes:
+        if node.data['kind'] == 'Service' and node.name == svc:
+          self.node >> Edge(label=f'{path["path"]} -> {port}') >> node.node
+
+
+
+KIND_MAPPING = {
+  'Deployment': Deployment,
+  'Service': Service,
+  'Ingress': Ingress
+}
