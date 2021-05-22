@@ -8,11 +8,14 @@ what will actually be deployed with a set of YAML definitions.
 
 Clone the repo and run `pip install -r requirements.txt`
 
+  You will also need to install [graphviz](https://graphviz.org/download/).
+
 ## Running
 
 This script takes one argument, a path to a folder 
 containing K8s YAML definitions and outputs a PNG
-diagram representing those definitions.
+diagram representing those definitions. To automatically open
+the image upon completion, add the `--show` flag.
 
 `python diagram.py <path_to_folder>`
 

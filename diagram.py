@@ -3,6 +3,7 @@ import sys
 from diagrams import Diagram, Node
 from yaml import load
 from pathlib import Path
+import argparse
 
 from kinds import map_kind
 
@@ -20,12 +21,29 @@ class K8sDiagram:
     else:
       self.nodes.append(kind(data, self))
 
-  def run(self):
-    with Diagram("Kubernetes", show=False, direction="TB"):
+  def run(self, show=False):
+    with Diagram("Kubernetes", show=show, direction="TB"):
       paths = Path(self.folder_path).glob('**/*.yaml')
       for path in paths:
         self.process_file(path)
       for node in self.nodes:
         node.link(self)
 
-K8sDiagram(sys.argv[1]).run()
+if __name__ == '__main__':
+  parser = argparse.ArgumentParser(description='Create preview diagram of K8s YAML')
+  parser.add_argument(
+    'folder_path', 
+    metavar='Folder Path', 
+    type=str, 
+    nargs=1, 
+    help='Path to a folder containing K8s YAML Files'
+  )
+  parser.add_argument(
+    '--show', 
+    dest='show',
+    action='store_true',
+    help='Show the diagram when finished'
+  )
+  args = parser.parse_args()
+  print(args.folder_path)
+  K8sDiagram(args.folder_path[0]).run(show=args.show)
