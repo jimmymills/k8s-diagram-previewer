@@ -67,7 +67,7 @@ class Service:
   def link(self, context):
     selector = self.data['spec']['selector']
     for node in context.nodes:
-      if not node.labels or node.kind not in ('Pod', 'Deployment'):
+      if not node.labels or node.data['kind'] not in ('Pod', 'Deployment'):
         continue
       for k in selector.keys():
         if node.labels.get(k) != selector[k]:
