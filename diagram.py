@@ -24,6 +24,9 @@ class K8sDiagram:
         self.process_resource(resource)
 
   def process_resource(self, data):
+    if not hasattr(data, 'kind'):
+      return
+    
     kind = map_kind(data['kind'])
     if issubclass(kind, Node):
       kind(data['metadata']['name'])
