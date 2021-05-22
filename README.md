@@ -36,4 +36,4 @@ This tool currently supports the following Kubernetes resource types:
 * DaemonSet
 * StatefulSet
 
-Their is partial support for all node types listed at https://diagrams.mingrammer.com/docs/nodes/k8s but links will not be formed.
+There is partial support for all node types listed at https://diagrams.mingrammer.com/docs/nodes/k8s but links will not be formed.
