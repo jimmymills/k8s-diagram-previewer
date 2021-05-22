@@ -5,12 +5,13 @@ from yaml import load, load_all
 from pathlib import Path
 import argparse
 
-from kinds import map_kind
+from kinds import map_kind, module_names
 
 class K8sDiagram:
   def __init__(self, folder_path):
     self.nodes = []
     self.folder_path = folder_path
+    self.spacer = '    '
 
   def process_file(self, path):
     with open(path) as file:
@@ -32,12 +33,16 @@ class K8sDiagram:
       return
 
     if issubclass(kind, Node):
-      kind(data['metadata']['name'])
+      self.file.write(f"{kind.__name__}({data['metadata']['name']})")
     else:
-      self.nodes.append(kind(data))
+      self.nodes.append(kind(data, self))
 
   def run(self, show=False):
-    with Diagram("Kubernetes", show=show, direction="TB"):
+    with open('create_diagram.py', 'w') as file:
+      self.file = file
+      for name in module_names:
+        self.file.write(f'from {name} import *\n')
+      self.file.write(f'with Diagram("Kubernetes", show={show}, direction="TB"):\n')
       paths = Path(self.folder_path).glob('*.yaml')
       for path in paths:
         self.process_file(path)
