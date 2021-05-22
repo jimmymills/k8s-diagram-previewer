@@ -1,6 +1,6 @@
-import sys
+import os
 
-from diagrams import Diagram, Node
+from diagrams import Node
 from yaml import load, load_all
 from pathlib import Path
 import argparse
@@ -48,6 +48,8 @@ class K8sDiagram:
         self.process_file(path)
       for node in self.nodes:
         node.link(self)
+      if show:
+        os.popen('python3 create_diagram.py')
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Create preview diagram of K8s YAML')
@@ -65,5 +67,4 @@ if __name__ == '__main__':
     help='Show the diagram when finished'
   )
   args = parser.parse_args()
-  print(args.folder_path)
   K8sDiagram(args.folder_path[0]).run(show=args.show)
