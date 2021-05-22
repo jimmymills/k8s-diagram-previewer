@@ -24,7 +24,7 @@ class K8sDiagram:
         self.process_resource(resource)
 
   def process_resource(self, data):
-    if not hasattr(data, 'kind'):
+    if 'kind' not in data:
       return
     
     kind = map_kind(data['kind'])
