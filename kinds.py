@@ -1,9 +1,32 @@
+import importlib
+
 from diagrams import Cluster, Edge
 from diagrams.k8s.compute import Pod
 from diagrams.k8s.network import SVC, Ing
 
+modules = [importlib.import_module(m) for m in (
+  'diagrams.k8s.compute', 
+  'diagrams.k8s.network', 
+  'diagrams.k8s.clusterconfig',
+  'diagrams.k8s.group',
+  'diagrams.k8s.others',
+  'diagrams.k8s.podconfig',
+  'diagrams.k8s.rbac',
+  'diagrams.k8s.storage'
+)]
+
 def get_name(data):
   return data['metadata']['name']
+
+def map_kind(kind):
+  if kind in KIND_MAPPING:
+    return KIND_MAPPING[kind]
+  else:
+    for module in modules:
+      try:
+        return getattr(module, kind)
+      except AttributeError:
+        pass
 
 class Deployment:
   def __init__(self, data, context):
