@@ -28,6 +28,9 @@ class K8sDiagram:
       return
     
     kind = map_kind(data['kind'])
+    if not kind:
+      return
+
     if issubclass(kind, Node):
       kind(data['metadata']['name'])
     else:
