@@ -55,6 +55,31 @@ class K8sPod:
   def link(self, context):
     pass
 
+class DaemonSet:
+  def __init__(self, data):
+    self.data = data
+    self.name = get_name(data)
+    self.labels = data['spec']['template']['metadata'].get('labels')
+    with Cluster(f'DaemonSet: {self.name}'):
+      self.node = Pod(f'{self.name}')
+
+  def link(self, context):
+    pass
+
+
+class StatefulSet:
+  def __init__(self, data):
+    self.data = data
+    self.name = get_name(data)
+    self.labels = data['spec']['template']['metadata'].get('labels')
+    with Cluster(f'StatefulSet: {self.name}'):
+      self.node = [
+          Pod(f'{self.name}-{i}') for i in range(data['spec']['replicas'])
+      ]
+
+  def link(self, context):
+    pass
+
 
 class Service:
   def __init__(self, data):
@@ -67,7 +92,7 @@ class Service:
   def link(self, context):
     selector = self.data['spec']['selector']
     for node in context.nodes:
-      if not node.labels or node.data['kind'] not in ('Pod', 'Deployment'):
+      if not node.labels or node.data['kind'] not in ('Pod', 'Deployment', 'DaemonSet', 'StatefulSet'):
         continue
       for k in selector.keys():
         if node.labels.get(k) != selector[k]:
@@ -105,5 +130,7 @@ KIND_MAPPING = {
   'Service': Service,
   'Ingress': Ingress,
   'Pod': K8sPod,
-  'CronJob': Cronjob
+  'CronJob': Cronjob,
+  'DaemonSet': DaemonSet,
+  'StatefulSet': StatefulSet
 }
