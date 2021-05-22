@@ -1,7 +1,7 @@
 import sys
 
 from diagrams import Diagram, Node
-from yaml import load
+from yaml import load, load_all
 from pathlib import Path
 import argparse
 
@@ -14,7 +14,16 @@ class K8sDiagram:
 
   def process_file(self, path):
     with open(path) as file:
-      data = load(file)
+      content = file.read()
+      if '---' in content:
+        resources = load_all(content)
+      else:
+        resources = [load(content)]
+      
+      for resource in resources:
+        self.process_resource(resource)
+
+  def process_resource(self, data):
     kind = map_kind(data['kind'])
     if issubclass(kind, Node):
       kind(data['metadata']['name'])
