@@ -28,5 +28,6 @@ This tool currently supports the following Kubernetes resource types:
 * Deployment
 * Service
 * Ingress
+* Pod
 
 Their is partial support for all node types listed at https://diagrams.mingrammer.com/docs/nodes/k8s but links will not be formed.

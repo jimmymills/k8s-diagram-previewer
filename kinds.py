@@ -34,12 +34,23 @@ class Deployment:
     self.name = get_name(data)
     containers = data['spec']['template']['spec']['containers']
     self.ports = [port for container in containers for port in container['ports']]
-    self.labels = data['spec']['template']['metadata']['labels']
+    self.labels = data['spec']['template']['metadata'].get('labels')
     with Cluster(f'Deployment: {self.name}'):
       with Cluster(f'ReplicaSet: {self.name}'):
         self.node = [
             Pod(f'{self.name}-{i}') for i in range(data['spec']['replicas'])
         ]
+
+  def link(self, context):
+    pass
+
+
+class K8sPod:
+  def __init__(self, data):
+    self.data = data
+    self.name = get_name(data)
+    self.labels = data['metadata'].get('labels')
+    self.node = Pod(self.name)
 
   def link(self, context):
     pass
@@ -85,5 +96,6 @@ class Ingress:
 KIND_MAPPING = {
   'Deployment': Deployment,
   'Service': Service,
-  'Ingress': Ingress
+  'Ingress': Ingress,
+  'Pod': K8sPod
 }
