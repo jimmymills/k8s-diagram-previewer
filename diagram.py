@@ -48,8 +48,7 @@ class K8sDiagram:
         self.process_file(path)
       for node in self.nodes:
         node.link(self)
-      if show:
-        os.popen('python3 create_diagram.py')
+      os.popen('python3 create_diagram.py')
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Create preview diagram of K8s YAML')
