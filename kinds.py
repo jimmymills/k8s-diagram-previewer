@@ -69,8 +69,10 @@ class Service:
     for node in context.nodes:
       if node.labels == selector:
         port_label = ""
-        for port in self.ports:
-          port_label += f"{port['port']} -> {port['targetPort']}\n"
+        # port_label is too sloppy, leaving commented until
+        # a better method is found for denoting port mapping
+        # for port in self.ports:
+        #   port_label += f"{port['port']} -> {port['targetPort']}\n"
         self.node >> Edge(label=port_label) >> node.node
 
 
