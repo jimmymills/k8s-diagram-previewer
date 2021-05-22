@@ -34,7 +34,7 @@ class K8sNode:
   def __init__(self, data, context):
     self.data = data
     self.name = data['metadata']['name']
-    self.var_name = f"{data['kind']}_{self.name.replace('-', '_')}"
+    self.var_name = f"{data['kind'].lower()}_{self.name.replace('-', '_')}"
     self.labels = data['metadata'].get('labels')
 
   def link(self, context):
