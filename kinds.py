@@ -1,7 +1,7 @@
 import importlib
 
 from diagrams import Cluster, Edge
-from diagrams.k8s.compute import Pod
+from diagrams.k8s.compute import Pod, Cronjob
 from diagrams.k8s.network import SVC, Ing
 
 modules = [importlib.import_module(m) for m in (
@@ -104,5 +104,6 @@ KIND_MAPPING = {
   'Deployment': Deployment,
   'Service': Service,
   'Ingress': Ingress,
-  'Pod': K8sPod
+  'Pod': K8sPod,
+  'CronJob': Cronjob
 }
