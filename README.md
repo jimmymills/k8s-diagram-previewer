@@ -21,6 +21,8 @@ the image upon completion, add the `--show` flag.
 
 To try out the example, run `python3 diagram.py ./example_yaml`
 
+For Helm Charts, run `helm template <path_to_chart> > <file_name>` and drop the file into a folder to run the script against.
+
 ## Support
 
 This tool currently supports the following Kubernetes resource types:
