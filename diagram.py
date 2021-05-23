@@ -3,7 +3,7 @@ import io
 import inspect
 
 from diagrams import Node
-from yaml import load, load_all
+from yaml import load, load_all, FullLoader
 from pathlib import Path
 import argparse
 
@@ -26,9 +26,9 @@ class K8sDiagram:
     with open(path) as file:
       content = file.read()
       if '---' in content:
-        resources = load_all(content)
+        resources = load_all(content, Loader=FullLoader)
       else:
-        resources = [load(content)]
+        resources = [load(content, Loader=FullLoader)]
       
       for resource in resources:
         self.process_resource(resource)
