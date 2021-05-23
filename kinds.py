@@ -68,6 +68,9 @@ class Workload(K8sNode):
     return links
 
   def link(self, context):
+    if context.nw_only:
+      return
+
     links = set()
     links.update(self.link_helper(context, 'ConfigMap', [
       'spec.containers.env.valueFrom.configMapKeyRef.name',

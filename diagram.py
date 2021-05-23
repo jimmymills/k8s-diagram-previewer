@@ -9,10 +9,11 @@ import argparse
 from kinds import map_kind, module_names
 
 class K8sDiagram:
-  def __init__(self, folder_path):
+  def __init__(self, folder_path, nw_only=False):
     self.nodes = []
     self.folder_path = folder_path
     self.spacer = '    '
+    self.nw_only = nw_only
 
   def write(self, string):
     self.file.write(string)
@@ -101,5 +102,11 @@ if __name__ == '__main__':
     action='store_true',
     help='Save a python script at create_diagram.py that can be edited to add more to the diagram.'
   )
+  parser.add_argument(
+    '-n',
+    '--networking-only',
+    action='store_true',
+    help='Only draw diagram edges to display networking, ignore storage links, etc.'
+  )
   args = parser.parse_args()
-  K8sDiagram(args.folder_path[0]).run(args.show, args.format, args.save_py)
+  K8sDiagram(args.folder_path[0], nw_only=args.networking_only).run(args.show, args.format, args.save_py)
