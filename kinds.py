@@ -120,7 +120,7 @@ class DaemonSet(Workload):
     context.write(f'''
     with Cluster(f'DaemonSet: {self.name}'):
       {self.var_name} = Pod('{self.name}')
-    ''')
+''')
 
 
 class StatefulSet(Workload):
