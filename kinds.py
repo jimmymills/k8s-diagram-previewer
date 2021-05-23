@@ -137,7 +137,10 @@ class Service(K8sNode):
     self.ports = data['spec']['ports']
 
   def link(self, context):
-    selector = self.data['spec']['selector']
+    try:
+      selector = self.data['spec']['selector']
+    except AttributeError:
+      return
     for node in context.nodes:
       if not node.labels or node.data['kind'] not in ('Pod', 'Deployment', 'DaemonSet', 'StatefulSet'):
         continue
