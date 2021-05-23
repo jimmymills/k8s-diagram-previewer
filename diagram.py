@@ -123,9 +123,20 @@ if __name__ == '__main__':
     nargs=1,
     help='String of arguments to use with helm template. Ex: "--set ingress.enabled=true"'
   )
+  parser.add_argument(
+    '--cluster-context',
+    help='Indicates a cluster to pull current definitions from. YAML of the current state will be stored at the target path.'
+  )
   args = parser.parse_args()
   if args.helm:
     TMP_PATH = '/tmp/helm_preview_yaml'
     os.popen(f'mkdir -p {TMP_PATH} && helm template {args.helm_args[0] if args.helm_args else ""} {args.folder_path[0]} > {TMP_PATH}/chart.yaml').read()
     args.folder_path[0] = TMP_PATH
+  elif args.cluster_context:
+    os.popen(f'''
+      mkdir -p {args.folder_path[0]}
+      for kind in "deploy svc ing cm secret pvc job cronjob ds sts"; do
+        kubectl --context={args.cluster_context} get $kind -o yaml > ${{kind}}.yaml
+      done
+    ''')
   K8sDiagram(args.folder_path[0], nw_only=args.networking_only).run(args.show, args.format, args.save_py)
