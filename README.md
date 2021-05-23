@@ -23,7 +23,8 @@ open the image upon completion, add the `--show` flag.
 
 To try out the example, run `python3 diagram.py ./example_yaml`
 
-For Helm Charts, run `helm template <path_to_chart> > <file_name>` and drop the file into a folder to run the script against.
+For Helm Charts, simply run with the --helm flag and your chart will be
+templated and placed into `/tmp/helm_preview_yaml/chart.yaml` before the script runs.
 
 Run `python diagram.py -h` to see other available options.
 
