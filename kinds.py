@@ -47,8 +47,8 @@ class Deployment(K8sNode):
     self.ports = [port for container in containers for port in container['ports']]
     self.labels = data['spec']['template']['metadata'].get('labels')
     context.file.write(f'''
-    with Cluster(f'Deployment: {self.name}'):
-      with Cluster(f'ReplicaSet: {self.name}'):
+    with Cluster('Deployment: {self.name}'):
+      with Cluster('ReplicaSet: {self.name}'):
         {self.var_name} = {str([f"Pod('{self.name}-{i}')" for i in range(data['spec']['replicas'])]).replace('"', '')}
 ''')
 
