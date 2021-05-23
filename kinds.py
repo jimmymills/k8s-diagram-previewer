@@ -1,7 +1,6 @@
 import importlib
 
-from diagrams.k8s.compute import Pod, Cronjob
-from diagrams.k8s.network import SVC, Ing
+from diagrams.k8s.compute import Cronjob
 
 module_names = [
   'diagrams',
@@ -17,9 +16,6 @@ module_names = [
 
 modules = [importlib.import_module(m) for m in module_names]
 
-def get_name(data):
-  return data['metadata']['name']
-
 def map_kind(kind):
   if kind in KIND_MAPPING:
     return KIND_MAPPING[kind]
@@ -29,6 +25,28 @@ def map_kind(kind):
         return getattr(module, kind)
       except AttributeError:
         pass
+
+
+def query_dict(data, query):
+  print(query)
+  keys = query.split('.')
+  results = []
+  for i, key in enumerate(keys):
+    if key in data:
+      if isinstance(data[key], list):
+        for result in data[key]:
+          results += query_dict(result, '.'.join(keys[i+1:]))
+      else:
+        data = data[key]
+    else:
+      break
+  else:
+    if isinstance(data, list):
+      results = data
+    else:
+      results = [data]
+
+  return results
 
 class K8sNode:
   def __init__(self, data, context):
@@ -40,13 +58,38 @@ class K8sNode:
   def link(self, context):
     pass
 
+class Workload(K8sNode):
+  def link_helper(self, context, type, queries):
+    links = set()
+    for query in queries:
+      link_names = query_dict(self.pod_data, query)
+      for name in link_names:
+        links.add(context.lookup_var_name([type], name))
+    return links
 
-class Deployment(K8sNode):
+  def link(self, context):
+    links = set()
+    links.update(self.link_helper(context, 'ConfigMap', [
+      'spec.containers.env.valueFrom.configMapKeyRef.name',
+      'spec.volumes.configMap.name'
+    ]))
+    links.update(self.link_helper(context, 'Secret', [
+      'spec.containers.env.valueFrom.secretKeyRef.name',
+      'spec.volumes.secret.secretName'
+    ]))
+
+    for link in links:
+      if link:
+        context.write_ln(f"{self.var_name} >> {link}")
+
+
+class Deployment(Workload):
   def __init__(self, data, context):
     super().__init__(data, context)
-    containers = data['spec']['template']['spec']['containers']
+    self.pod_data = data['spec']['template']
+    containers = self.pod_data['spec']['containers']
     self.ports = [port for container in containers for port in container['ports']]
-    self.labels = data['spec']['template']['metadata'].get('labels')
+    self.labels = self.pod_data['metadata'].get('labels')
     context.write(f'''
     with Cluster('Deployment: {self.name}'):
       with Cluster('ReplicaSet: {self.name}'):
@@ -54,26 +97,29 @@ class Deployment(K8sNode):
 ''')
 
 
-class K8sPod(K8sNode):
+class K8sPod(Workload):
   def __init__(self, data, context):
     super().__init__(data, context)
+    self.pod_data = self.data
     context.write_ln(f"{self.var_name} = Pod('{self.name}')")
 
 
-class DaemonSet(K8sNode):
+class DaemonSet(Workload):
   def __init__(self, data, context):
     super().__init__(data, context)
-    self.labels = data['spec']['template']['metadata'].get('labels')
+    self.pod_data = data['spec']['template']
+    self.labels = self.pod_data['metadata'].get('labels')
     context.write(f'''
     with Cluster(f'DaemonSet: {self.name}'):
       {self.var_name} = Pod('{self.name}')
     ''')
 
 
-class StatefulSet(K8sNode):
+class StatefulSet(Workload):
   def __init__(self, data, context):
     super().__init__(data, context)
-    self.labels = data['spec']['template']['metadata'].get('labels')
+    self.pod_data = data['spec']['template']
+    self.labels = self.pod_data['metadata'].get('labels')
     context.file.write(f'''
     with Cluster(f'StatefulSet: {self.name}'):
       {self.var_name} = {str([f"Pod('{self.name}-{i}')" for i in range(data['spec']['replicas'])]).replace('"', '')}
@@ -114,6 +160,17 @@ class Ingress(K8sNode):
           context.write_ln(f"{self.var_name} >> Edge(label='{path['path']} -> {port}') >> {node.var_name}")
 
 
+class ConfigMap(K8sNode):
+  def __init__(self, data, context):
+      super().__init__(data, context)
+      context.write_ln(f"{self.var_name} = CM('{self.name}')")
+
+
+class Secret(K8sNode):
+  def __init__(self, data, context):
+      super().__init__(data, context)
+      context.write_ln(f"{self.var_name} = Secret('{self.name}')")
+
 
 KIND_MAPPING = {
   'Deployment': Deployment,
@@ -122,5 +179,7 @@ KIND_MAPPING = {
   'Pod': K8sPod,
   'CronJob': Cronjob,
   'DaemonSet': DaemonSet,
-  'StatefulSet': StatefulSet
+  'StatefulSet': StatefulSet,
+  'ConfigMap': ConfigMap,
+  'Secret': Secret,
 }

@@ -19,3 +19,9 @@ spec:
         image: nginx:1.14.2
         ports:
         - containerPort: 8000
+        env:
+        - name: SECRET_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: secret-credentails
+              key: password

@@ -44,6 +44,11 @@ class K8sDiagram:
     else:
       self.nodes.append(kind(data, self))
 
+  def lookup_var_name(self, kinds, name):
+    for node in self.nodes:
+      if node.data['kind'] in kinds and node.name == name:
+        return node.var_name
+
   def run(self, show, image_format, save_py):
     with io.StringIO() as file:
       self.file = file

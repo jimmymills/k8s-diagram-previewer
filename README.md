@@ -39,5 +39,7 @@ This tool currently supports the following Kubernetes resource types:
 * Job
 * DaemonSet
 * StatefulSet
+* ConfigMap
+* Secret
 
 There is partial support for all node types listed at https://diagrams.mingrammer.com/docs/nodes/k8s but links will not be formed.
