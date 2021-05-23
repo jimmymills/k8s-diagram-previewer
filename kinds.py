@@ -92,8 +92,7 @@ class Deployment(Workload):
   def __init__(self, data, context):
     super().__init__(data, context)
     self.pod_data = data['spec']['template']
-    containers = self.pod_data['spec']['containers']
-    self.ports = [port for container in containers for port in container['ports']]
+    self.ports = query_dict(self.pod_data, 'spec.containers.ports')
     self.labels = self.pod_data['metadata'].get('labels')
     context.write(f'''
     with Cluster('Deployment: {self.name}'):
