@@ -121,7 +121,7 @@ if __name__ == '__main__':
   parser.add_argument(
     '--helm-args',
     nargs=1,
-    help='String of arguments to use with helm template.'
+    help='String of arguments to use with helm template. Ex: "--set ingress.enabled=true"'
   )
   args = parser.parse_args()
   if args.helm:

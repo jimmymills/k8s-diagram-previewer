@@ -29,12 +29,12 @@ templated and placed into `/tmp/helm_preview_yaml/chart.yaml` before the script 
 Run `python diagram.py -h` to see other available options.
 
 ```
-usage: diagram.py [-h] [-s] [-f {png,jpg,pdf,svg}] [-p] [-n] Folder Path
+usage: diagram.py [-h] [-s] [-f {png,jpg,pdf,svg}] [-p] [-n] [--helm] [--helm-args HELM_ARGS] Folder Path
 
 Create preview diagram of K8s YAML
 
 positional arguments:
-  Folder Path           Path to a folder containing K8s YAML Files
+  Folder Path           Path to the target definitions
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -44,6 +44,9 @@ optional arguments:
   -p, --diagram-py      Save a python script at create_diagram.py that can be edited to add more to the diagram.
   -n, --networking-only
                         Only draw diagram edges to display networking, ignore storage links, etc.
+  --helm                Indicates that the path given is a helm chart that needs to be templated.
+  --helm-args HELM_ARGS
+                        String of arguments to use with helm template. Ex: "--set ingress.enabled=true"
 ```
 
 ## Support
