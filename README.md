@@ -27,6 +27,24 @@ For Helm Charts, run `helm template <path_to_chart> > <file_name>` and drop the 
 
 Run `python diagram.py -h` to see other available options.
 
+```
+usage: diagram.py [-h] [-s] [-f {png,jpg,pdf,svg}] [-p] [-n] Folder Path
+
+Create preview diagram of K8s YAML
+
+positional arguments:
+  Folder Path           Path to a folder containing K8s YAML Files
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -s, --show            Show the diagram when finished
+  -f {png,jpg,pdf,svg}, --image-format {png,jpg,pdf,svg}
+                        Output diagram as png, jpg, svg or pdf.
+  -p, --diagram-py      Save a python script at create_diagram.py that can be edited to add more to the diagram.
+  -n, --networking-only
+                        Only draw diagram edges to display networking, ignore storage links, etc.
+```
+
 ## Support
 
 This tool currently supports the following Kubernetes resource types:
