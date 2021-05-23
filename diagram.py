@@ -36,6 +36,10 @@ class K8sDiagram:
   def process_resource(self, data):
     if not data or 'kind' not in data:
       return
+
+    if data['kind'] == 'List':
+      for item in data['items']:
+        self.process_resource(data)
     
     kind = map_kind(data['kind'])
     if not kind or not inspect.isclass(kind):
