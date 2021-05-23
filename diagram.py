@@ -41,7 +41,7 @@ class K8sDiagram:
       return
 
     if issubclass(kind, Node):
-      self.file.write(f"{kind.__name__}({data['metadata']['name']})")
+      self.write_ln(f"{kind.__name__}({data['metadata']['name']})")
     else:
       self.nodes.append(kind(data, self))
 
