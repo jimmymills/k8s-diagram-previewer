@@ -125,5 +125,7 @@ if __name__ == '__main__':
   )
   args = parser.parse_args()
   if args.helm:
-    os.popen(f'mkdir -p /tmp/helm_preview_yaml/ && helm template {args.helm_args[0] if args.helm_args else ""} {args.folder_path[0]} > /tmp/helm_preview_yaml/chart.yaml')
+    TMP_PATH = '/tmp/helm_preview_yaml'
+    os.popen(f'mkdir -p {TMP_PATH} && helm template {args.helm_args[0] if args.helm_args else ""} {args.folder_path[0]} > {TMP_PATH}/chart.yaml')
+    args.folder_path[0] = TMP_PATH
   K8sDiagram(args.folder_path[0], nw_only=args.networking_only).run(args.show, args.format, args.save_py)
