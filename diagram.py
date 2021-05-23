@@ -1,5 +1,6 @@
 import os
 import io
+import inspect
 
 from diagrams import Node
 from yaml import load, load_all
@@ -37,7 +38,7 @@ class K8sDiagram:
       return
     
     kind = map_kind(data['kind'])
-    if not kind:
+    if not kind or not inspect.isclass(kind):
       return
 
     if issubclass(kind, Node):
