@@ -12,16 +12,20 @@ Clone the repo and run `pip install -r requirements.txt`
 
 ## Running
 
-This script takes one argument, a path to a folder 
-containing K8s YAML definitions and outputs a PNG
-diagram representing those definitions. To automatically open
-the image upon completion, add the `--show` flag.
+This script takes one argument, a path to a folder containing K8s 
+YAML definitions and outputs a PNG diagram at kubernetes.png 
+representing those definitions, as well as a python file at 
+create_diagram.py if you would like to extend the diagram with 
+other infrastructure surrounding your project. To automatically
+open the image upon completion, add the `--show` flag.
 
 `python diagram.py <path_to_folder>`
 
 To try out the example, run `python3 diagram.py ./example_yaml`
 
 For Helm Charts, run `helm template <path_to_chart> > <file_name>` and drop the file into a folder to run the script against.
+
+Run `python diagram.py -h` to see other available options.
 
 ## Support
 

@@ -1,10 +1,10 @@
 import importlib
 
-from diagrams import Cluster, Edge
 from diagrams.k8s.compute import Pod, Cronjob
 from diagrams.k8s.network import SVC, Ing
 
-modules = [importlib.import_module(m) for m in (
+module_names = [
+  'diagrams',
   'diagrams.k8s.compute', 
   'diagrams.k8s.network', 
   'diagrams.k8s.clusterconfig',
@@ -13,7 +13,9 @@ modules = [importlib.import_module(m) for m in (
   'diagrams.k8s.podconfig',
   'diagrams.k8s.rbac',
   'diagrams.k8s.storage'
-)]
+]
+
+modules = [importlib.import_module(m) for m in module_names]
 
 def get_name(data):
   return data['metadata']['name']
@@ -28,66 +30,61 @@ def map_kind(kind):
       except AttributeError:
         pass
 
-class Deployment:
-  def __init__(self, data):
+class K8sNode:
+  def __init__(self, data, context):
     self.data = data
-    self.name = get_name(data)
+    self.name = data['metadata']['name']
+    self.var_name = f"{data['kind'].lower()}_{self.name.replace('-', '_')}"
+    self.labels = data['metadata'].get('labels')
+
+  def link(self, context):
+    pass
+
+
+class Deployment(K8sNode):
+  def __init__(self, data, context):
+    super().__init__(data, context)
     containers = data['spec']['template']['spec']['containers']
     self.ports = [port for container in containers for port in container['ports']]
     self.labels = data['spec']['template']['metadata'].get('labels')
-    with Cluster(f'Deployment: {self.name}'):
-      with Cluster(f'ReplicaSet: {self.name}'):
-        self.node = [
-            Pod(f'{self.name}-{i}') for i in range(data['spec']['replicas'])
-        ]
-
-  def link(self, context):
-    pass
+    context.write(f'''
+    with Cluster('Deployment: {self.name}'):
+      with Cluster('ReplicaSet: {self.name}'):
+        {self.var_name} = {str([f"Pod('{self.name}-{i}')" for i in range(data['spec']['replicas'])]).replace('"', '')}
+''')
 
 
-class K8sPod:
-  def __init__(self, data):
-    self.data = data
-    self.name = get_name(data)
-    self.labels = data['metadata'].get('labels')
-    self.node = Pod(self.name)
+class K8sPod(K8sNode):
+  def __init__(self, data, context):
+    super().__init__(data, context)
+    context.write_ln(f"{self.var_name} = Pod('{self.name}')")
 
-  def link(self, context):
-    pass
 
-class DaemonSet:
-  def __init__(self, data):
-    self.data = data
-    self.name = get_name(data)
+class DaemonSet(K8sNode):
+  def __init__(self, data, context):
+    super().__init__(data, context)
     self.labels = data['spec']['template']['metadata'].get('labels')
+    context.write(f'''
     with Cluster(f'DaemonSet: {self.name}'):
-      self.node = Pod(f'{self.name}')
-
-  def link(self, context):
-    pass
+      {self.var_name} = Pod('{self.name}')
+    ''')
 
 
-class StatefulSet:
-  def __init__(self, data):
-    self.data = data
-    self.name = get_name(data)
+class StatefulSet(K8sNode):
+  def __init__(self, data, context):
+    super().__init__(data, context)
     self.labels = data['spec']['template']['metadata'].get('labels')
+    context.file.write(f'''
     with Cluster(f'StatefulSet: {self.name}'):
-      self.node = [
-          Pod(f'{self.name}-{i}') for i in range(data['spec']['replicas'])
-      ]
-
-  def link(self, context):
-    pass
+      {self.var_name} = {str([f"Pod('{self.name}-{i}')" for i in range(data['spec']['replicas'])]).replace('"', '')}
+''')
 
 
-class Service:
-  def __init__(self, data):
-    self.data = data
-    self.name = get_name(data)
-    self.node = SVC(self.name)
+class Service(K8sNode):
+  def __init__(self, data, context):
+    super().__init__(data, context)
+    context.write_ln(f"{self.var_name} = SVC('{self.name}')")
     self.ports = data['spec']['ports']
-    self.labels = data['metadata'].get('labels')
 
   def link(self, context):
     selector = self.data['spec']['selector']
@@ -98,20 +95,13 @@ class Service:
         if node.labels.get(k) != selector[k]:
           break
       else:
-        port_label = ""
-        # port_label is too sloppy, leaving commented until
-        # a better method is found for denoting port mapping
-        # for port in self.ports:
-        #   port_label += f"{port['port']} -> {port['targetPort']}\n"
-        self.node >> Edge(label=port_label) >> node.node
+        context.write_ln(f"{self.var_name} >> {node.var_name}")
 
 
-class Ingress:
-  def __init__(self, data):
-    self.data = data
-    self.name = get_name(data)
-    self.node = Ing(self.name)
-    self.labels = data['metadata'].get('labels')
+class Ingress(K8sNode):
+  def __init__(self, data, context):
+    super().__init__(data, context)
+    context.write_ln(f"{self.var_name} = Ing('{self.name}')")
 
   def link(self, context):
     rules = self.data['spec']['rules']
@@ -121,7 +111,7 @@ class Ingress:
       port = path['backend'].get('servicePort') or path['backend']['service']['port']['number']
       for node in context.nodes:
         if node.data['kind'] == 'Service' and node.name == svc:
-          self.node >> Edge(label=f'{path["path"]} -> {port}') >> node.node
+          context.write_ln(f"{self.var_name} >> Edge(label='{path['path']} -> {port}') >> {node.var_name}")
 
 
 
