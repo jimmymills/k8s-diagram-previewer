@@ -31,6 +31,8 @@ def query_dict(data, query):
   keys = query.split('.')
   results = []
   for i, key in enumerate(keys):
+    if not key:
+      continue
     if key in data:
       if isinstance(data[key], list):
         for result in data[key]:
@@ -40,10 +42,12 @@ def query_dict(data, query):
     else:
       break
   else:
+    if results:
+      return results
     if isinstance(data, list):
-      results = data
+      results += data 
     else:
-      results = [data]
+      results.append(data)
 
   return results
 
@@ -54,10 +58,6 @@ class K8sNode:
     self.var_name = f"{data['kind'].lower()}_{self.name.replace('-', '_')}"
     self.labels = data['metadata'].get('labels')
 
-  def link(self, context):
-    pass
-
-class Workload(K8sNode):
   def link_helper(self, context, type, queries):
     links = set()
     for query in queries:
@@ -66,6 +66,10 @@ class Workload(K8sNode):
         links.add(context.lookup_var_name([type], name))
     return links
 
+  def link(self, context):
+    pass
+
+class Workload(K8sNode):
   def link(self, context):
     if context.nw_only:
       return
@@ -157,14 +161,23 @@ class Ingress(K8sNode):
     context.write_ln(f"{self.var_name} = Ing('{self.name}')")
 
   def link(self, context):
-    rules = self.data['spec']['rules']
-    paths = [path for rule in rules for path in rule['http']['paths']]
+    paths = query_dict(self.data, 'spec.rules.http.paths')
+    links = {}
     for path in paths:
       svc = path['backend'].get('serviceName') or path['backend']['service']['name']
       port = path['backend'].get('servicePort') or path['backend']['service']['port']['number']
-      for node in context.nodes:
-        if node.data['kind'] == 'Service' and node.name == svc:
-          context.write_ln(f"{self.var_name} >> Edge(label='{path['path']} -> {port}') >> {node.var_name}")
+      svc_var_name = context.lookup_var_name(['Service'], svc)
+      if not svc_var_name:
+        continue
+      elif svc_var_name not in links:
+        links[svc_var_name] = {'paths': set()}
+      
+      links[svc_var_name]['paths'].add(f"{path['path']} -> {port}") 
+
+    
+    for k, v in links.items():
+      path_label = '\n'.join(v['paths'])
+      context.write_ln(f"{self.var_name} >> Edge(label='{path_label}') >> {k}")
 
 
 class ConfigMap(K8sNode):
