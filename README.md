@@ -26,6 +26,9 @@ To try out the example, run `python3 diagram.py ./example_yaml`
 For Helm Charts, simply run with the --helm flag and your chart will be
 templated and placed into `/tmp/helm_preview_yaml/chart.yaml` before the script runs.
 
+You can also pass in a context from kubeconfig with the `--cluster-context` flag to pull in all supported resources from
+the target context prior to diagram generation.
+
 Run `python diagram.py -h` to see other available options.
 
 ```
