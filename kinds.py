@@ -177,7 +177,7 @@ class Ingress(K8sNode):
     
     for k, v in links.items():
       path_label = '\n'.join(v['paths'])
-      context.write_ln(f"{self.var_name} >> Edge(label='{path_label}') >> {k}")
+      context.write_ln(f"{self.var_name} >> Edge(label='''{path_label}''') >> {k}")
 
 
 class ConfigMap(K8sNode):
