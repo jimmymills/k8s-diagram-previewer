@@ -40,13 +40,14 @@ class K8sNode:
   def link(self, context):
     pass
 
+
 class Deployment(K8sNode):
   def __init__(self, data, context):
     super().__init__(data, context)
     containers = data['spec']['template']['spec']['containers']
     self.ports = [port for container in containers for port in container['ports']]
     self.labels = data['spec']['template']['metadata'].get('labels')
-    context.file.write(f'''
+    context.write(f'''
     with Cluster('Deployment: {self.name}'):
       with Cluster('ReplicaSet: {self.name}'):
         {self.var_name} = {str([f"Pod('{self.name}-{i}')" for i in range(data['spec']['replicas'])]).replace('"', '')}
@@ -56,14 +57,14 @@ class Deployment(K8sNode):
 class K8sPod(K8sNode):
   def __init__(self, data, context):
     super().__init__(data, context)
-    context.file.write(f"{context.spacer}{self.var_name} = Pod('{self.name}')\n")
+    context.write_ln(f"{self.var_name} = Pod('{self.name}')")
 
 
 class DaemonSet(K8sNode):
   def __init__(self, data, context):
     super().__init__(data, context)
     self.labels = data['spec']['template']['metadata'].get('labels')
-    context.file.write(f'''
+    context.write(f'''
     with Cluster(f'DaemonSet: {self.name}'):
       {self.var_name} = Pod('{self.name}')
     ''')
@@ -82,7 +83,7 @@ class StatefulSet(K8sNode):
 class Service(K8sNode):
   def __init__(self, data, context):
     super().__init__(data, context)
-    context.file.write(f"{context.spacer}{self.var_name} = SVC('{self.name}')")
+    context.write_ln(f"{self.var_name} = SVC('{self.name}')")
     self.ports = data['spec']['ports']
 
   def link(self, context):
@@ -94,13 +95,13 @@ class Service(K8sNode):
         if node.labels.get(k) != selector[k]:
           break
       else:
-        context.file.write(f"{context.spacer}{self.var_name} >> {node.var_name}\n")
+        context.write_ln(f"{self.var_name} >> {node.var_name}")
 
 
 class Ingress(K8sNode):
   def __init__(self, data, context):
     super().__init__(data, context)
-    context.file.write(f"{context.spacer}{self.var_name} = Ing('{self.name}')\n")
+    context.write_ln(f"{self.var_name} = Ing('{self.name}')")
 
   def link(self, context):
     rules = self.data['spec']['rules']
@@ -110,7 +111,7 @@ class Ingress(K8sNode):
       port = path['backend'].get('servicePort') or path['backend']['service']['port']['number']
       for node in context.nodes:
         if node.data['kind'] == 'Service' and node.name == svc:
-          context.file.write(f"{context.spacer}{self.var_name} >> Edge(label='{path['path']} -> {port}') >> {node.var_name}\n")
+          context.write_ln(f"{self.var_name} >> Edge(label='{path['path']} -> {port}') >> {node.var_name}")
 
 
 

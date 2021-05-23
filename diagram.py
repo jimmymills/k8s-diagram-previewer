@@ -14,6 +14,12 @@ class K8sDiagram:
     self.folder_path = folder_path
     self.spacer = '    '
 
+  def write(self, string):
+    self.file.write(string)
+
+  def write_ln(self, string, include_space=True):
+    self.write(f'{self.spacer if include_space else ""}{string}\n')
+
   def process_file(self, path):
     with open(path) as file:
       content = file.read()
@@ -42,8 +48,8 @@ class K8sDiagram:
     with io.StringIO() as file:
       self.file = file
       for name in module_names:
-        self.file.write(f'from {name} import *\n')
-      self.file.write(f'with Diagram("Kubernetes", show={show}, direction="TB", outformat="{image_format}"):\n')
+        self.write_ln(f'from {name} import *', include_space=False)
+      self.write_ln(f'with Diagram("Kubernetes", show={show}, direction="TB", outformat="{image_format}"):', include_space=False)
       paths = Path(self.folder_path).glob('*.yaml')
       for path in paths:
         self.process_file(path)
