@@ -83,7 +83,7 @@ if __name__ == '__main__':
     metavar='Folder Path', 
     type=str, 
     nargs=1, 
-    help='Path to a folder containing K8s YAML Files'
+    help='Path to the target definitions'
   )
   parser.add_argument(
     '-s',
@@ -113,5 +113,19 @@ if __name__ == '__main__':
     action='store_true',
     help='Only draw diagram edges to display networking, ignore storage links, etc.'
   )
+  parser.add_argument(
+    '--helm',
+    action='store_true',
+    help='Indicates that the path given is a helm chart that needs to be templated.'
+  )
+  parser.add_argument(
+    '--helm-args',
+    nargs=1,
+    help='String of arguments to use with helm template.'
+  )
   args = parser.parse_args()
+  if args.helm:
+    TMP_PATH = '/tmp/helm_preview_yaml'
+    os.popen(f'mkdir -p {TMP_PATH} && helm template {args.helm_args[0] if args.helm_args else ""} {args.folder_path[0]} > {TMP_PATH}/chart.yaml').read()
+    args.folder_path[0] = TMP_PATH
   K8sDiagram(args.folder_path[0], nw_only=args.networking_only).run(args.show, args.format, args.save_py)
