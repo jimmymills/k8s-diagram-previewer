@@ -133,10 +133,5 @@ if __name__ == '__main__':
     os.popen(f'mkdir -p {TMP_PATH} && helm template {args.helm_args[0] if args.helm_args else ""} {args.folder_path[0]} > {TMP_PATH}/chart.yaml').read()
     args.folder_path[0] = TMP_PATH
   elif args.cluster_context:
-    os.popen(f'''
-      mkdir -p {args.folder_path[0]}
-      for kind in "deploy svc ing cm secret pvc job cronjob ds sts"; do
-        kubectl --context={args.cluster_context} get $kind -o yaml > ${{kind}}.yaml
-      done
-    ''')
+    os.popen(f'bash ./pull_cluster_info.sh {args.folder_path[0]} {args.cluster_context}').read()
   K8sDiagram(args.folder_path[0], nw_only=args.networking_only).run(args.show, args.format, args.save_py)
