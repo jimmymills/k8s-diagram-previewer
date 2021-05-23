@@ -28,7 +28,6 @@ def map_kind(kind):
 
 
 def query_dict(data, query):
-  print(query)
   keys = query.split('.')
   results = []
   for i, key in enumerate(keys):
