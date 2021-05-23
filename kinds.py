@@ -139,7 +139,7 @@ class Service(K8sNode):
   def link(self, context):
     try:
       selector = self.data['spec']['selector']
-    except AttributeError:
+    except KeyError:
       return
     for node in context.nodes:
       if not node.labels or node.data['kind'] not in ('Pod', 'Deployment', 'DaemonSet', 'StatefulSet'):
