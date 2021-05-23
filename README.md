@@ -41,5 +41,6 @@ This tool currently supports the following Kubernetes resource types:
 * StatefulSet
 * ConfigMap
 * Secret
+* PersistentVolumeClaim
 
 There is partial support for all node types listed at https://diagrams.mingrammer.com/docs/nodes/k8s but links will not be formed.

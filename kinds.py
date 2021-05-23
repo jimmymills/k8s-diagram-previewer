@@ -77,6 +77,9 @@ class Workload(K8sNode):
       'spec.containers.env.valueFrom.secretKeyRef.name',
       'spec.volumes.secret.secretName'
     ]))
+    links.update(self.link_helper(context, 'PersistentVolumeClaim', [
+      'spec.volumes.persistentVolumeClaim.claimName'
+    ]))
 
     for link in links:
       if link:
@@ -172,6 +175,12 @@ class Secret(K8sNode):
       context.write_ln(f"{self.var_name} = Secret('{self.name}')")
 
 
+class PersistentVolumeClaim(K8sNode):
+  def __init__(self, data, context):
+      super().__init__(data, context)
+      context.write_ln(f"{self.var_name} = PVC('{self.name}')")
+
+
 KIND_MAPPING = {
   'Deployment': Deployment,
   'Service': Service,
@@ -182,4 +191,5 @@ KIND_MAPPING = {
   'StatefulSet': StatefulSet,
   'ConfigMap': ConfigMap,
   'Secret': Secret,
+  'PersistentVolumeClaim': PersistentVolumeClaim,
 }
