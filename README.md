@@ -6,9 +6,9 @@ what will actually be deployed with a set of YAML definitions.
 
 ## Installation
 
-Clone the repo and run `pip install -r requirements.txt`
+Clone the repo and run `pip install k8s-diagram`
 
-  You will also need to install [graphviz](https://graphviz.org/download/).
+  You may also need to install [graphviz](https://graphviz.org/download/).
 
 ## Running
 
