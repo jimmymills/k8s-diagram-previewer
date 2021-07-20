@@ -3,7 +3,7 @@ from enum import Enum
 
 import typer
 
-from diagram import K8sDiagram
+from .diagram import K8sDiagram
 
 app = typer.Typer()
 
