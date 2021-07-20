@@ -32,6 +32,12 @@ prior to chart generation.
 
 Run `k8s-diagram --help` to see other available options.
 
+## Docker
+
+You can alternatively run this project by running the docker image and mounting the yaml you want to use to /target. The image will be saved into the folder mounted to /target.
+
+Ex: `docker run -v "$(pwd)/k8s_yaml:/target" jimmymills/k8s-diagram`
+
 ## Support
 
 This tool currently supports the following Kubernetes resource types:
