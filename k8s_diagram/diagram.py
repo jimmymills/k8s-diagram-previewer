@@ -5,7 +5,6 @@ import inspect
 from diagrams import Node
 from yaml import load, load_all, FullLoader
 from pathlib import Path
-import argparse
 
 from .kinds import map_kind, module_names
 

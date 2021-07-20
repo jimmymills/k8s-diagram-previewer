@@ -21,7 +21,7 @@ open the image upon completion, add the `--show` flag.
 
 `k8s-diagram <path_to_folder>`
 
-To try out the example, run `k8s-diagram ./example_yaml`
+To try out the example, run `k8s-diagram ./examples/yaml`
 
 For Helm Charts, simply run with the --helm flag and your chart will be
 templated and placed into `/tmp/helm_preview_yaml/chart.yaml` before the script runs.
@@ -36,7 +36,9 @@ Run `k8s-diagram --help` to see other available options.
 
 You can alternatively run this project by running the docker image and mounting the yaml you want to use to /target. The image will be saved into the folder mounted to /target.
 
-Ex: `docker run -v "$(pwd)/k8s_yaml:/target" jimmymills/k8s-diagram`
+Ex: `docker run -v "$(pwd)/k8s_yaml:/target" jimmymills/k8s-diagram /target`
+
+For Helm: `docker run -v "$(pwd):/target" -v "$(pwd)/example_helm:/helm" diagram /helm --helm`
 
 ## Support
 

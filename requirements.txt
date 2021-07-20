@@ -1,4 +1,0 @@
-diagrams
-pyyaml
-argparse
-typer
