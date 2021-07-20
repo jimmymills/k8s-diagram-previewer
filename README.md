@@ -19,7 +19,7 @@ create_diagram.py if you would like to extend the diagram with
 other infrastructure surrounding your project. To automatically
 open the image upon completion, add the `--show` flag.
 
-`python diagram.py <path_to_folder>`
+`python app.py <path_to_folder>`
 
 To try out the example, run `python3 diagram.py ./example_yaml`
 

@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "k8s-diagram"
+version = "0.1.0"
+description = "Creates a preview diagram of Kubernetes Resources without the need to apply them."
+authors = ["Jimmy Mills <jimmyemills+github@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.scripts]
+k8s-diagram = "k8s_diagram.app:app"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+typer = {extras = ["all"], version = "^0.3.2"}
+diagrams = "^0.20.0"
+PyYAML = "^5.4.1"
+argparse = "^1.4.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
