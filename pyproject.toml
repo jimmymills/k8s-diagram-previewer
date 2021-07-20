@@ -9,7 +9,7 @@ readme = "README.md"
 k8s-diagram = "k8s_diagram.app:app"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.8.2"
 typer = {extras = ["all"], version = "^0.3.2"}
 diagrams = "^0.20.0"
 PyYAML = "^5.4.1"
