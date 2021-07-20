@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "k8s-diagram"
-version = "0.1.6"
+version = "0.1.7"
 description = "Creates a preview diagram of Kubernetes Resources without the need to apply them."
 authors = ["Jimmy Mills <jimmyemills+github@gmail.com>"]
 readme = "README.md"
