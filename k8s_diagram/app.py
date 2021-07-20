@@ -34,7 +34,9 @@ def diagram(
         os.popen(f'mkdir -p {TMP_PATH} && helm template {helm_args} {folder_path} > {TMP_PATH}/chart.yaml').read()
         folder_path = TMP_PATH
     elif cluster_context:
-        os.popen(f'bash ./pull_cluster_info.sh {folder_path} {cluster_context}').read()
+        __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+        path = os.path.join(__location__, 'pull_cluster_info.sh')
+        os.popen(f'bash {path} {folder_path} {cluster_context}').read()
     K8sDiagram(folder_path, nw_only=networking_only).run(show, image_format.value, diagram_py)
 
 

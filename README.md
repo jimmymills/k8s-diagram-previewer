@@ -6,9 +6,9 @@ what will actually be deployed with a set of YAML definitions.
 
 ## Installation
 
-Clone the repo and run `pip install k8s-diagram`
+Run `pip install k8s-diagram`
 
-  You may also need to install [graphviz](https://graphviz.org/download/).
+You may also need to install [graphviz](https://graphviz.org/download/).
 
 ## Running
 
@@ -27,7 +27,8 @@ For Helm Charts, simply run with the --helm flag and your chart will be
 templated and placed into `/tmp/helm_preview_yaml/chart.yaml` before the script runs.
 
 You can also pass in a context from kubeconfig with the `--cluster-context` flag to pull in all supported resources from
-the target context prior to diagram generation.
+the target context prior to diagram generation. The resources found at the context will be copied into the target folder 
+prior to chart generation. 
 
 Run `k8s-diagram --help` to see other available options.
 
